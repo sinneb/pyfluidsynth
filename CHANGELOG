@@ -1,0 +1,20 @@
+July 22, 2008 : VERSION 1.2.1
+
+Added pydoc documentation and this CHANGELOG.
+--
+July 22, 2008 : VERSION 1.2
+
+Changed from C extension code to ctypes for portability and simplicity
+of code.
+
+Updated interface to use objects instead of just functions.
+--
+July 21, 2008 : VERSION 1.1
+
+Added direct audio data interface so you don't have to start audio
+driver thread.  Makes pyFluidSynth work for audio games and other
+applications that manage their own sound.
+--
+July 16, 2008 : VERSION 1.0
+
+Imported from previous work done earlier in the summer.
