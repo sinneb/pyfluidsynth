@@ -23,8 +23,13 @@ import numpy
 from ctypes import *
 from ctypes.util import find_library
 
+# Find the FluidSynth library, throw descriptive error when missing.
+lib = find_library('fluidsynth')
+if lib is None:
+	raise ImportError, "Couldn't find the FluidSynth library."
+
 # Dynamically link the FluidSynth library
-_fl = CDLL(find_library('fluidsynth'))
+_fl = CDLL(lib)
 
 # make function prototypes a bit easier to declare
 def cfunc(name, result, *args):
@@ -215,9 +220,19 @@ class Synth:
         return fluid_synth_program_select(self.synth, chan, sfid, bank, preset)
     def noteon(self, chan, key, vel):
         """Play a note"""
+	if key < 0 or key > 128:
+		return False
+	if chan < 0:
+		return False
+	if vel < 0 or vel > 128:
+		return False
         return fluid_synth_noteon(self.synth, chan, key, vel)
     def noteoff(self, chan, key):
         """Stop a note"""
+	if key < 0 or key > 128:
+		return False
+	if chan < 0:
+		return False
         return fluid_synth_noteoff(self.synth, chan, key)
     def pitch_bend(self, chan, val):
         """Adjust pitch of a playing channel by small amounts

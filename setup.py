@@ -1,7 +1,7 @@
 from distutils.core import setup, Extension
 
 setup (name = 'pyFluidSynth',
-       version = '1.2.2',
+       version = '1.2.3',
        author = 'Nathan Whitehead',
        author_email = 'nwhitehe@gmail.com',
        maintainer = 'Bart Spaans',
