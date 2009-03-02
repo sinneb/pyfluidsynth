@@ -1,39 +1,49 @@
 """
-pyFluidSynth
+================================================================================
 
-Python bindings for FluidSynth
+	pyFluidSynth
 
-Copyright 2008, Nathan Whitehead <nwhitehe@gmail.com>
-Released under the LGPL
+	Python bindings for FluidSynth
 
-This module contains python bindings for FluidSynth.  FluidSynth is a
-software synthesizer for generating music.  It works like a MIDI
-synthesizer.  You load patches, set parameters, then send NOTEON and
-NOTEOFF events to play notes.  Instruments are defined in SoundFonts,
-generally files with the extension SF2.  FluidSynth can either be used
-to play audio itself, or you can call a function that returns chunks
-of audio data and output the data to the soundcard yourself.
-FluidSynth works on all major platforms, so pyFluidSynth should also.
+	Copyright 2008, Nathan Whitehead <nwhitehe@gmail.com>
+	Currently maintained by Bart Spaans <onderstekop@gmail.com>
+	Released under the LGPL
 
+	This module contains python bindings for FluidSynth.  FluidSynth is a
+	software synthesizer for generating music.  It works like a MIDI
+	synthesizer.  You load patches, set parameters, then send NOTEON and
+	NOTEOFF events to play notes.  Instruments are defined in SoundFonts,
+	generally files with the extension SF2.  FluidSynth can either be used
+	to play audio itself, or you can call a function that returns chunks
+	of audio data and output the data to the soundcard yourself.
+	FluidSynth works on all major platforms, so pyFluidSynth should also.
+
+================================================================================
 """
 
 import time
-import numpy
-
 from ctypes import *
 from ctypes.util import find_library
 
-# Find the FluidSynth library, throw descriptive error when missing.
-lib = find_library('fluidsynth')
+
+# A short circuited or expression to find the FluidSynth library
+# (mostly needed for Windows distributions of libfluidsynth supplied with QSynth)
+
+lib = find_library('fluidsynth') or find_library('libfluidsynth') or find_library('libfluidsynth-1')
+
+
 if lib is None:
 	raise ImportError, "Couldn't find the FluidSynth library."
+
 
 # Dynamically link the FluidSynth library
 _fl = CDLL(lib)
 
-# make function prototypes a bit easier to declare
+
+
+# Helper function for declaring function prototypes
 def cfunc(name, result, *args):
-    """build and apply a ctypes prototype complete with parameter flags"""
+    """Build and apply a ctypes prototype complete with parameter flags"""
     atypes = []
     aflags = []
     for arg in args:
@@ -41,8 +51,10 @@ def cfunc(name, result, *args):
         aflags.append((arg[2], arg[0]) + arg[3:])
     return CFUNCTYPE(result, *atypes)((name, _fl), tuple(aflags))
 
+
 # Bump this up when changing the interface for users
 api_version = '1.2'
+
 
 # Function prototypes for C versions of functions
 new_fluid_settings = cfunc('new_fluid_settings', c_void_p)
@@ -156,6 +168,7 @@ def fluid_synth_write_s16_stereo(synth, len):
     Return value is a Numpy array of samples.
     
     """
+    import numpy
     buf = create_string_buffer(len * 4)
     fluid_synth_write_s16(synth, len, buf, 0, 2, buf, 1, 2)
     return numpy.fromstring(buf[:], dtype=numpy.int16)
@@ -291,4 +304,5 @@ def raw_audio_string(data):
     is 16-bit signed (other formats not currently supported).
     
     """
+    import numpy
     return (data.astype(numpy.int16)).tostring()
