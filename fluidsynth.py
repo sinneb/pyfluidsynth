@@ -216,6 +216,9 @@ class Synth:
         if driver is not None:
             assert (driver in ['alsa', 'oss', 'jack', 'portaudio', 'sndmgr', 'coreaudio', 'Direct Sound']) 
             fluid_settings_setstr(self.settings, 'audio.driver', driver)
+            # if jack than autoconnect
+            if driver == 'jack':
+                fluid_settings_setint(self.settings, 'audio.jack.autoconnect', 1)
         self.audio_driver = new_fluid_audio_driver(self.settings, self.synth)
     def delete(self):
         if self.audio_driver is not None:
